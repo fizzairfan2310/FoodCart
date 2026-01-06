@@ -1,0 +1,19 @@
+{
+    "version": 2,
+    "framework": "laravel",
+    "functions": {
+        "api/index.php": {
+            "runtime": "vercel-php@0.7.0"
+        }
+    },
+    "routes": [
+        {
+            "src": "/(css|js|images|uploads|storage)/(.*)",
+            "dest": "/public/$1/$2"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.php"
+        }
+    ]
+}
