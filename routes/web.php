@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-// Sab controllers ke sahi path (namespace) yahan define hain
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -17,55 +16,79 @@ use App\Http\Controllers\Admin\DashboardController;
 |--------------------------------------------------------------------------
 */
 
-// 1. LANDING PAGE
+// =========================
+// LANDING PAGE
+// =========================
 Route::get('/', function () {
     return view('welcome');
 })->name('landing');
 
-// 2. STATIC AUTH ROUTES (No Controller Needed - Just Blade Views)
-Route::get('/login', function () {
-    return view('auth.login'); 
-})->name('login');
 
-Route::get('/register', function () {
-    return view('auth.register');
-})->name('register');
+// =========================
+// AUTH (USER + ADMIN)
+// =========================
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
-// 3. USER PANEL - Browse Foods
+// =========================
+// USER SIDE (HOME)
+// =========================
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/search', [HomeController::class, 'search'])->name('search');
 
 
-// 4. CART SYSTEM
-Route::prefix('cart')->group(function () {
-    Route::get('/', [CartController::class, 'index'])->name('cart.index');
-    Route::get('/add/{id}', [CartController::class, 'add'])->name('cart.add');
-    Route::post('/update/{id}', [CartController::class, 'update'])->name('cart.update');
-    Route::get('/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
-    Route::get('/clear', [CartController::class, 'clear'])->name('cart.clear');
-});
+// =========================
+// CART
+// =========================
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::get('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
+Route::get('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+Route::get('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 
-// 5. CHECKOUT SYSTEM
+// =========================
+// CHECKOUT
+// =========================
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'placeOrder'])->name('place.order');
 
 
-// 6. ADMIN PANEL (No Auth Required as per your request)
-Route::prefix('admin')->name('admin.')->group(function () {
-    
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// =========================
+// ADMIN PANEL (PROTECTED)
+// =========================
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware('simple.admin')
+    ->group(function () {
 
-    // Categories CRUD
-    Route::resource('categories', CategoryController::class);
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
 
-    // Foods CRUD
-    Route::resource('foods', FoodController::class);
+        // Categories
+        Route::resource('categories', CategoryController::class);
 
-    // Orders Management
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
-    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
-    Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
+        // Foods
+        Route::resource('foods', FoodController::class);
+
+        // Orders
+        Route::get('/orders', [OrderController::class, 'index'])
+            ->name('orders');
+
+        Route::get('/orders/{id}', [OrderController::class, 'show'])
+            ->name('orders.show');
+
+        // ✅ FIXED (THIS WAS MISSING)
+        Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])
+            ->name('orders.status');
+
+        Route::delete('/orders/{id}', [OrderController::class, 'destroy'])
+            ->name('orders.destroy');
 });

@@ -13,14 +13,13 @@ class CreateOrdersTable extends Migration
      */
     public function up()
     {
-    Schema::create('orders', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('user_id')->constrained();
-    $table->integer('total');
-    $table->string('status')->default('pending');
-    $table->timestamps();
-    });
-
+        Schema::create('orders', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->nullable()->constrained();  // Added nullable for guest orders
+            $table->integer('total');
+            $table->string('status')->default('pending');
+            $table->timestamps();
+        });
     }
 
     /**

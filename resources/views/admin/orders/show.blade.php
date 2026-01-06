@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-5xl mx-auto px-4">
     <div class="mb-8 flex justify-between items-center">
-        <a href="{{ route('admin.orders.index') }}" class="text-[10px] font-black uppercase tracking-[0.3em] text-blue-400 hover:text-white transition flex items-center gap-2">
+        <a href="{{ route('admin.orders') }}" class="text-[10px] font-black uppercase tracking-[0.3em] text-blue-400 hover:text-white transition flex items-center gap-2">
             <i class="fas fa-arrow-left"></i> Back to Terminal
         </a>
         <div class="flex items-center gap-3">

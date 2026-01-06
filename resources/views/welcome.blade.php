@@ -11,39 +11,68 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Poppins:wght@300;600;900&display=swap');
-        body { margin: 0; background: #020617; overflow: hidden; font-family: 'Poppins', sans-serif; color: white; }
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-        .hero-title { font-family: 'Syncopate', sans-serif; background: linear-gradient(to bottom, #ffffff 40%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 0.9; }
-        .order-btn { background: linear-gradient(90deg, #3b82f6, #8b5cf6); box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); transition: all 0.3s ease; }
         
-        /* New Button Style for Nav */
-        .nav-link { font-[9px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-white transition; }
-        .signup-btn { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.5); padding: 8px 20px; border-radius: 12px; color: #3b82f6; font-weight: 900; font-size: 10px; tracking: 0.2em; transition: all 0.3s; }
-        .signup-btn:hover { background: #3b82f6; color: white; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        body { 
+            margin: 0; 
+            background: #020617; 
+            overflow: hidden; 
+            font-family: 'Poppins', sans-serif; 
+            color: white; 
+            height: 100vh;
+        }
+
+        #bg-canvas { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 1; 
+            pointer-events: none;
+        }
+
+        .hero-title { 
+            font-family: 'Syncopate', sans-serif; 
+            background: linear-gradient(to bottom, #ffffff 40%, #3b82f6 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            line-height: 0.9; 
+        }
+
+        .btn-cosmic {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+            transition: all 0.4s ease;
+        }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
 
-    <nav class="fixed top-0 w-full z-50 px-10 py-8 flex justify-between items-center bg-gradient-to-b from-[#020617] to-transparent">
+    <nav class="fixed top-0 w-full z-50 px-10 py-8 flex justify-between items-center">
         <div class="text-3xl font-black italic tracking-tighter text-blue-500">FOOD<span class="text-white">CART</span></div>
-        
         <div class="flex gap-8 items-center">
-            <a href="{{ route('admin.dashboard') }}" class="text-[10px] tracking-[0.3em] font-bold text-gray-500 hover:text-white transition uppercase">Admin</a>
-            
-            <a href="{{ route('login') }}" class="nav-link text-[10px] font-black uppercase tracking-[0.2em]">Login</a>
-            <a href="{{ route('register') }}" class="signup-btn uppercase">Sign Up</a>
+            <a href="{{ route('login') }}" class="text-[10px] font-bold tracking-[0.2em] text-gray-400 hover:text-white uppercase">Admin</a>
+            <a href="{{ route('login') }}" class="text-[10px] font-bold tracking-[0.2em] text-gray-400 hover:text-white uppercase">Login</a>
+            <a href="{{ route('register') }}" class="bg-blue-600/10 border border-blue-500/50 px-5 py-2 rounded-xl text-blue-500 font-black text-[10px] tracking-widest hover:bg-blue-600 hover:text-white transition-all uppercase">Sign Up</a>
         </div>
     </nav>
 
-    <main class="relative z-10 h-screen flex items-center px-10 md:px-24 pointer-events-none">
-        <div class="w-full md:w-1/2 pointer-events-auto">
+    <main class="relative z-20 h-screen flex items-center px-10 md:px-24">
+        <div class="max-w-2xl">
             <h1 class="text-7xl md:text-9xl hero-title font-black mb-6 uppercase">FAST<br>FOOD.</h1>
             <p class="text-gray-400 text-xl mb-10 max-w-sm">Cosmic flavours delivered from the stars. Choose your craving.</p>
-            <a href="{{ route('home') }}" class="order-btn inline-flex items-center gap-3 px-12 py-5 rounded-2xl font-black text-lg text-white">
-                START ORDERING <i class="fas fa-bolt"></i>
-            </a>
+            
+            <div class="mt-10">
+                @if(session('user_id'))
+                    <a href="{{ route('home') }}" class="btn-cosmic inline-flex items-center gap-3 px-12 py-5 rounded-2xl font-black text-lg tracking-widest text-white animate-pulse">
+                        LAUNCH ORDER SEQUENCE <i class="fas fa-bolt"></i>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="btn-cosmic inline-flex items-center gap-3 px-12 py-5 rounded-2xl font-black text-lg tracking-widest text-white animate-pulse">
+                        INITIATE LOGIN SEQUENCE <i class="fas fa-sign-in-alt"></i>
+                    </a>
+                @endif
+            </div>
         </div>
     </main>
 
@@ -54,38 +83,36 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
 
-        // 1. Galaxy Stars
+        // --- ADMIN PANEL STYLE SLOW COSMIC DUST ---
         const starGeo = new THREE.BufferGeometry();
-        const posArr = new Float32Array(6000 * 3);
-        for(let i=0; i < 18000; i++) posArr[i] = (Math.random() - 0.5) * 100;
+        const posArr = new Float32Array(4000 * 3);
+        for(let i=0; i < 12000; i++) posArr[i] = (Math.random() - 0.5) * 100;
         starGeo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
-        scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.015, color: 0xffffff })));
+        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.015, color: 0x3b82f6 }));
+        scene.add(stars);
 
-        // 2. Lighting
-        scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+        scene.add(new THREE.AmbientLight(0xffffff, 1.5));
         const dirLight = new THREE.DirectionalLight(0xffffff, 2);
         dirLight.position.set(5, 5, 5);
         scene.add(dirLight);
 
-        // 3. Multi-Model Loading Logic
         const loader = new THREE.GLTFLoader();
         let models = []; 
 
-        function loadFood(path, xPos, yOffset, scale) {
+        function loadFood(path, x, y, z, scale) {
             loader.load(path, (gltf) => {
                 const model = gltf.scene;
                 model.scale.set(scale, scale, scale);
-                model.position.set(xPos, 0, 0);
-                model.userData.yOffset = yOffset; 
+                model.position.set(x, y, z);
                 scene.add(model);
                 models.push(model);
-            }, undefined, (err) => console.error("Error loading: " + path));
+            });
         }
 
-        loadFood('/models/pizza.glb', 3.6, 0.5, 6); 
-        loadFood('/models/burger.glb', 4.0, 0.5, 8); 
-        loadFood('/models/cake.glb', -12.0, 0.5, 80);
-        loadFood('/models/orange_juice.glb', 0, 0, 40);
+        // --- BACK TO YOUR ORIGINAL CLUSTER POSITIONS ---
+        loadFood('/models/pizza.glb', 4, 0, 0, 6); 
+        loadFood('/models/burger.glb', 5.5, 1.8, -1, 8); 
+        loadFood('/models/cake.glb', 3.5, -2, -1, 60);
 
         camera.position.z = 12;
 
@@ -99,13 +126,17 @@
             requestAnimationFrame(animate);
             const time = Date.now() * 0.001;
             
+            // Slow rotation from Admin Panel
+            stars.rotation.y += 0.0003;
+            stars.rotation.x += 0.0001;
+
             models.forEach((model, index) => {
-                model.rotation.y += 0.01 + (index * 0.005);
+                model.rotation.y += 0.01;
+                model.position.y += Math.sin(time + index) * 0.003;
+                
+                // Mouse follow from your original logic
                 model.rotation.x = mouseY * 0.3;
-                model.position.y = Math.sin(time + index) * 0.5;
-                const targetX = (mouseX * 4) + (window.innerWidth > 768 ? 4 : 0);
-                const relativeX = (index - 1) * 2.5; 
-                model.position.x += (targetX + relativeX - model.position.x) * 0.05;
+                model.position.x += (mouseX * 0.5 - (model.position.x - (4 + index))) * 0.02;
             });
 
             renderer.render(scene, camera);

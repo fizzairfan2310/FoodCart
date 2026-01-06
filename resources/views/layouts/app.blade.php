@@ -3,83 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodCart | Cosmic Bites</title>
+    <title>@yield('title', 'FoodCart')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
-        
-        body { 
-            margin: 0; 
-            background: #020617; 
-            font-family: 'Poppins', sans-serif; 
-            color: white; 
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Poppins:wght@300;600;900&display=swap');
+
+        body {
+            margin: 0;
+            background: #020617;
+            font-family: 'Poppins', sans-serif;
+            color: white;
             min-height: 100vh;
         }
 
-        /* 3D Canvas Background */
-        #bg-canvas { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            z-index: -1; 
-        }
-
-        /* Glassmorphism Classes */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
+        /* Background Canvas Styling */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1; /* Content ke peeche */
+            pointer-events: none;
         }
 
         .nav-glass {
             background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .btn-cosmic {
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        /* Glass Cards for Home/Cart */
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 30px; 
         }
-        .btn-cosmic:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(59, 130, 246, 0.5); }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
     </style>
+    @yield('styles')
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
 
-    <nav class="fixed top-0 w-full z-50 nav-glass px-6 md:px-12 py-5 flex justify-between items-center">
-        <a href="{{ route('home') }}" class="text-3xl font-black italic text-blue-500 tracking-tighter">
-            FOOD<span class="text-white">CART</span>
-        </a>
-        <div class="flex gap-8 items-center">
-            <a href="{{ route('home') }}" class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-blue-400 transition">Home</a>
-            <a href="{{ route('cart.index') }}" class="relative text-white group">
-                <i class="fas fa-shopping-cart text-lg"></i>
-                <span class="absolute -top-3 -right-3 bg-blue-600 text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-[#020617]">
-                    {{ session('cart') ? count(session('cart')) : 0 }}
-                </span>
+    <nav class="nav-glass fixed top-0 w-full z-50 px-10 py-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="{{ route('home') }}" class="text-3xl font-black italic tracking-tighter text-blue-500">
+                FOOD<span class="text-white">CART</span>
             </a>
-            <a href="{{ route('admin.dashboard') }}" class="text-[9px] tracking-[0.3em] font-black text-gray-500 hover:text-white transition border border-white/10 px-4 py-2 rounded-xl">
-                ADMIN
-            </a>
+            
+            <div class="flex gap-8 items-center">
+                <a href="{{ route('home') }}" class="text-[10px] tracking-[0.3em] font-bold text-gray-400 hover:text-white transition uppercase">
+                    <i class="fas fa-home mr-1"></i> Home
+                </a>
+                
+                <a href="{{ route('cart.index') }}" class="text-[10px] tracking-[0.3em] font-bold text-gray-400 hover:text-white transition uppercase">
+                    <i class="fas fa-shopping-cart mr-1"></i> Cart
+                </a>
+
+                @if(session('user_role') === 'admin')
+                    <a href="{{ route('admin.dashboard') }}" class="text-[10px] tracking-[0.3em] font-bold text-blue-500 hover:text-white transition uppercase">
+                        <i class="fas fa-tachometer-alt mr-1"></i> Admin
+                    </a>
+                @endif
+
+                <div class="flex items-center gap-3">
+                    @if(session()->has('user_name'))
+                        <a href="{{ route('logout') }}" class="bg-red-500/10 border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition">
+                            LOGOUT
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="text-blue-400 text-[10px] font-black uppercase tracking-wider hover:text-white">Login</a>
+                    @endif
+                </div>
+            </div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-6 pt-32 pb-12 relative z-10">
+    <main class="pt-32 relative z-10">
         @yield('content')
-    </div>
+    </main>
 
     <script>
         const scene = new THREE.Scene();
@@ -92,7 +97,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
 
-        // 3D Cosmic Dust (Admin Stars)
+        // Cosmic Dust (Same as Admin)
         const starGeo = new THREE.BufferGeometry();
         const posArr = new Float32Array(4000 * 3);
         for(let i=0; i < 12000; i++) posArr[i] = (Math.random() - 0.5) * 100;
@@ -116,5 +121,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
+    @yield('scripts')
 </body>
 </html>

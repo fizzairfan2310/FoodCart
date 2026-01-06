@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use App\Models\User;
 
 class CheckoutController extends Controller
 {
@@ -22,7 +23,13 @@ class CheckoutController extends Controller
             $total += $item['price'] * $item['quantity'];
         }
         
-        return view('checkout', compact('cart', 'total'));
+        // Get logged in user info
+        $user = null;
+        if (Session::has('user_id')) {
+            $user = User::find(Session::get('user_id'));
+        }
+        
+        return view('checkout', compact('cart', 'total', 'user'));
     }
 
     public function placeOrder(Request $request)
@@ -49,7 +56,7 @@ class CheckoutController extends Controller
 
         // Create order
         $order = Order::create([
-            'user_id' => Auth::check() ? Auth::id() : null,
+            'user_id' => Session::has('user_id') ? Session::get('user_id') : null,
             'customer_name' => $validated['customer_name'],
             'customer_email' => $validated['customer_email'],
             'customer_phone' => $validated['customer_phone'],
