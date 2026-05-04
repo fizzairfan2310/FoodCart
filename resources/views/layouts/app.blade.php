@@ -63,7 +63,7 @@
                     <i class="fas fa-shopping-cart mr-1"></i> Cart
                 </a>
 
-                @if(session('user_role') === 'admin')
+                @if(session()->has('user_role') && strtolower(trim(session('user_role'))) === 'admin')
                     <a href="{{ route('admin.dashboard') }}" class="text-[10px] tracking-[0.3em] font-bold text-blue-500 hover:text-white transition uppercase">
                         <i class="fas fa-tachometer-alt mr-1"></i> Admin
                     </a>
@@ -83,6 +83,20 @@
     </nav>
 
     <main class="pt-32 relative z-10">
+        {{-- Flash Messages --}}
+        <div class="max-w-7xl mx-auto px-10 mb-6">
+            @if(session('error'))
+                <div class="bg-red-500/20 border border-red-500/50 text-red-400 p-4 rounded-xl text-center mb-4">
+                    {{ session('error') }}
+                </div>
+            @endif
+            @if(session('success'))
+                <div class="bg-green-500/20 border border-green-500/50 text-green-400 p-4 rounded-xl text-center mb-4">
+                    {{ session('success') }}
+                </div>
+            @endif
+        </div>
+
         @yield('content')
     </main>
 

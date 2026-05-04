@@ -20,6 +20,9 @@ use App\Http\Controllers\Admin\DashboardController;
 // LANDING PAGE
 // =========================
 Route::get('/', function () {
+    if (session('user_role') === 'admin' || (auth()->check() && auth()->user()->email === 'admin@foodcart.com')) {
+        return redirect()->route('admin.dashboard');
+    }
     return view('welcome');
 })->name('landing');
 

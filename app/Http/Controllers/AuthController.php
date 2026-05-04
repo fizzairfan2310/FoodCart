@@ -5,16 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     public function showLogin()
     {
-        if (session()->has('user_id')) {
-            return session('user_role') === 'admin'
-                ? redirect()->route('admin.dashboard')
-                : redirect()->route('home');
-        }
         return view('login');
     }
 
@@ -31,15 +27,23 @@ class AuthController extends Controller
             return back()->with('error', 'Invalid email or password');
         }
 
+        Auth::login($user);
+
+        $role = strtolower(trim($user->role));
+
         session([
             'user_id' => $user->id,
             'user_name' => $user->name,
-            'user_role' => $user->role,
+            'user_role' => $role,
         ]);
+        
+        session()->save();
 
-        return $user->role === 'admin'
-            ? redirect()->route('admin.dashboard')
-            : redirect()->route('home');
+        if ($role === 'admin' || $user->email === 'admin@foodcart.com') {
+            return redirect('/admin/dashboard');
+        }
+
+        return redirect()->route('home');
     }
 
     public function showRegister()
@@ -76,6 +80,7 @@ class AuthController extends Controller
 
     public function logout()
     {
+        Auth::logout();
         session()->flush();
         return redirect()->route('landing');
     }
